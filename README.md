@@ -1,9 +1,10 @@
-# Serverside part of university project
+# University project | serverside
 
-Implementations in different languages can be found here. One one will be chosen as final in the end.
-
+TODO: description
 
 ## License
+
+Copyright © 2020
 
 This program and the accompanying materials are made available under the
 terms of the Eclipse Public License 2.0 which is available at
