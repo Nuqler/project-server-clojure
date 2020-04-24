@@ -1,10 +1,14 @@
 (ns ring-app.core
   (:require
    [reitit.ring :as reitit]
-   [muuntaja.middleware :as muuntaja]
    [ring.adapter.jetty :as jetty]
+   [muuntaja.middleware :as muuntaja]
    [ring.util.http-response :as response]
-   [ring.middleware.reload :refer [wrap-reload]]))
+   [ring.middleware.reload :refer [wrap-reload]]
+   [muuntaja.middleware :refer [wrap-format]]
+   [clojure.java.jdbc :as sql]
+   [ring-app.db.core :as db]))
+
 
 (defn response-handler [request]
   (response/ok
@@ -12,26 +16,13 @@
         (:remote-addr request)
         "</body></html>")))
 
-(defn json-handler [request]
+(defn user-getter [request]
   (response/ok
-   {:result (get-in request [:body-params :id])}))
+   (db/get-all-users)))
 
-(def routes
-  [["/" {:get response-handler
-         :post response-handler}]
-   ["/echo/:id"
-    {:get
-     (fn [{{:keys  [id]} :path-params}]
-       (response/ok (str "<p>The value is: " id "</p>")))}]
-   ["/api"
-    {:middleware [wrap-formats]}
-    ["/multiply"
-     {:post (fn [{{:keys [a b]} :body-params}]
-              (response/ok {:result (* a b)}))}]]])
-
-(def handler
-  (reitit/ring-handler
-   (reitit/router routes)))
+;; (defn db-response-handler [request]
+;;   (response/ok
+;;    (db/eval-hug-sql request)))
 
 (defn wrap-nocache [handler]
   (fn [request]
@@ -43,6 +34,42 @@
   (-> handler
       (muuntaja/wrap-format)))
 
+(def routes
+  [["/" {:get response-handler
+         :post response-handler}]
+   ["/echo/:id"
+    {:get
+     (fn [{{:keys [id]} :path-params}]
+       (response/ok (str "<p>the value is: " id "</p>")))}]
+   ["/api"
+    {:middleware [wrap-format]}
+    ["/get-user/:id"
+     {:get
+      (fn [{{:keys [id]} :path-params}]
+        (response/ok (db/get-user id)))}]
+    ["/add-user"
+     {:post
+      (fn [{{:keys [id pass]} :path-params}]
+        (response/ok (db/add-user! {:id id :pass pass})))}] ;; FIX ME!!!!!!!!!!!!!!!!!
+    ["/get-users"
+     {:get user-getter}]
+    ["/hug-test"
+     {:get (fn [_]
+             (response/ok
+              (db/hug-test)))}]]])
+
+(def handler
+  (reitit/routes
+   (reitit/ring-handler
+    (reitit/router routes))
+   (reitit/create-default-handler
+    {:not-found
+     (constantly (response/not-found "404 - Page not found"))
+     :method-not-allowed
+     (constantly (response/method-not-allowed "405 - Not allowed"))
+     :not-acceptable
+     (constantly (response/not-acceptable "406 - Not acceptable"))})))
+
 (defn -main []
   (jetty/run-jetty
    (-> #'handler
@@ -50,3 +77,5 @@
        wrap-reload)
    {:port 3000
     :join? false}))
+
+
