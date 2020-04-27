@@ -1,6 +1,8 @@
-# University project | serverside
+# University project | EA serverside
 
 ## Description
+
+Serverside part of the 'EA' University Project.
 
 Current version provides very basic user registration and login validation functions.
 
@@ -17,7 +19,7 @@ At the moment the server relies on conscience of the user to input valid data to
 
 ### Preliminary Configuration
 
-The following repository includes an example file called 'example_config.edn'. This file should be placed in the same folder as server jar file.
+The server must have MSSQL instance installed. The following repository includes an example file called 'example_config.edn'. This file should be placed in the same folder as server jar file.
 
 This file must be renamed to 'config.edn' and the DB configuration details must be specified inside (only MSSQL is supported). Failing to provide necessary configuration or misplacing the file itself will result in failure to connect to the database.
 
