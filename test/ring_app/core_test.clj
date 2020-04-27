@@ -3,5 +3,5 @@
             [ring-app.core :refer :all]))
 
 (deftest a-test
-  (testing "FIXME, I fail."
+  (testing "Nothing at the moment!"
     (is (= 0 1))))
