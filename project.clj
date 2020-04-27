@@ -8,6 +8,7 @@
                  [metosin/ring-http-response "0.9.1"]
                  [ring "1.7.1"]
                  [com.layerware/hugsql "0.4.9"]
+                 [com.layerware/hugsql-adapter-next-jdbc "0.5.1"]
                  [org.clojure/java.jdbc "0.7.9"]
                  [com.microsoft.sqlserver/mssql-jdbc "8.2.2.jre11"]
                  [seancorfield/next.jdbc "1.0.424"]]
@@ -16,5 +17,5 @@
   :main ring-app.core
   :ring {:handler ring-app.settings/handler
 	     :main ring-app.core}
-  :nrepl {:start? false}  
+  :nrepl {:start? false}
   :target-path "target/%s")

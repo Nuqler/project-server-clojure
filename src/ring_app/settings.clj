@@ -39,4 +39,4 @@
          wrap-nocache
          wrap-reload)
      {:port 3000
-      :join? false}))) ;;TRUE blocks repl prompt
+      :join? true}))) ;;TRUE blocks thread until server loads

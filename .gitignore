@@ -13,3 +13,4 @@ pom.xml.asc
 resources/config.edn
 resources/queries-PSQL.sql
 config.edn
+.#project.clj

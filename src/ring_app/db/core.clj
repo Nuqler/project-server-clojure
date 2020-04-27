@@ -3,10 +3,13 @@
    [next.jdbc :as sql]
    ;;[clojure.java.jdbc :as sql]
    [hugsql.core :as hugsql]
+   [hugsql.adapter.next-jdbc :as next-adapter]
    [clojure.edn :as edn]))
 
 ;; Get the hugsql queries
 (hugsql/def-db-fns "queries.sql")
+
+;;(hugsql/set-adapter! (next-adapter/hugsql-adapter-next-jdbc))
 
 (def db
   (try
@@ -18,59 +21,53 @@
 
 (def ds
   (if (nil? db)
-    (println "ERROR: Unable to setup DB configruation.")
+    (println "ERROR: Unable to setup DB configruation. Please provide 'config.edn' file and restart the server!")
     (sql/get-datasource db)))
 
-(defn create-users-table! []
-  (try
-    (sql/execute! ds
-                  ["CREATE TABLE users (id int IDENTITY(1,1) PRIMARY KEY,
-username varchar(30),
-pass varchar(100),
-role varchar(16),
-description varchar(255),
-registration_date DATETIME NOT NULL DEFAULT GETDATE())"])
-    (catch com.microsoft.sqlserver.jdbc.SQLServerException e
-    (str "ERROR: Table already exists!"))))
+;; create a 'users' table if it does not exist.
+;;TODO: Prettify; add verbosity.
+(create-users-table-if-not-exists! db)
 
+
+;; ----------- SQL QUERY FUNCTIONS -----------
 ;;TODO: REMOVE PLAINTEXT PASSWORDS
+;;TODO: Unify username and password check (less queries)
+
 (declare register-user!)
 (declare add-user-db!)
 
-(defn user-exists? [username]
-  (if (not (nil? (get-login-data db {:username username})))
-    true
-    false))
+(defn user-exists? [{:keys [username]}]
+  (not (nil? (get-login-data db {:username username}))))
 
-(defn pass-correct? [login-details];;----------------------------------------
-  (if (= (:pass (get-login-data db login-details)) (:pass login-details))
-    true
-    false))
+(defn pass-correct? [login-details] ;; very basic pass validation. 
+  (= (:pass (get-login-data db login-details)) (:pass login-details)))
 
-(defn get-user-db [id]
-  (let [user (get-user-id db id)]
-    (if (nil? test)
+(defn get-user-db [id-map]
+  (let [user (get-user-id db id-map)]
+    (if (nil? user)
       (str "User not found!")
       user)))
 
-(defn add-user-db! [user-details]
+(defn add-user-db! [user-details] ;; add/register a new user
   (if (user-exists? (select-keys user-details [:username]))
     (str "Username already exists!")
     (add-user! db user-details)))
 
-(defn remove-user-db! [id]
-  (remove-user! db {:id id}))
+(defn remove-user-db! [id-map] ;; remove a user from DB
+  (if (remove-user! db id-map)
+    (str "Success.")
+    (str "Fail.")))
 
-(defn get-all-users-db [_]
+(defn get-all-users-db [] ;; test function to get all the users from DB
   (get-all-users db))
 
 (defn register-user! [user-details]
   (if (= 1 (add-user-db! user-details))
     (str "Success")
-    (str "Fail. Username already exists?"))) ;;RIP
+    (str "Fail. Username already exists?")))
 
 
-(defn login [login-details] ;; debug login test data. sends all available user data on success.
+(defn login [login-details] ;; debug login test data. sends all available user data on success (excludes password).
   (if (and (user-exists? login-details) (pass-correct? login-details))
     (get-user-details db login-details)
     (str "Incorrect username or password!")))
