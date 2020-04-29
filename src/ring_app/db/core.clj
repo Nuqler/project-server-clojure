@@ -45,32 +45,31 @@
 (defn get-user-db [id-map]
   (let [user (get-user-id db id-map)]
     (if (nil? user)
-      (str "User not found!")
+      {:result "User not found!"}
       user)))
 
 (defn add-user-db! [user-details] ;; add/register a new user
   (if (user-exists? (select-keys user-details [:username]))
-    (str "Username already exists!")
+    {:result "Username already exists!"}
     (add-user! db user-details)))
 
 (defn remove-user-db! [id-map] ;; remove a user from DB
   (if (remove-user! db id-map)
-    (str "Success.")
-    (str "Fail.")))
+    {:result "Success."}
+    {:result "Fail."}))
 
 (defn get-all-users-db [] ;; test function to get all the users from DB
   (get-all-users db))
 
 (defn register-user! [user-details]
   (if (= 1 (add-user-db! user-details))
-    (str "Success")
-    (str "Fail. Username already exists?")))
-
+    {:result "Success"}
+    {:result "Fail. Username already exists?"}))
 
 (defn login [login-details] ;; debug login test data. sends all available user data on success (excludes password).
   (if (and (user-exists? login-details) (pass-correct? login-details))
     (get-user-details db login-details)
-    (str "Incorrect username or password!")))
+    {:result "Incorrect username or password!"}))
 
 (defn debug-login [login-details]
   (get-login-data db login-details)) ;;check DB functionality

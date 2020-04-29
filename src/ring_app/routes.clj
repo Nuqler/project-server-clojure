@@ -36,10 +36,10 @@
      {:post
       (fn [{{:keys [username pass]} :body-params}]
         (response/ok (db/login {:username username :pass pass})))}]
-    ["/debug-response" ;; return full response
-     {:post
-      (fn [received-response]
-        (response/ok (str received-response)))}]
+    ;; ["/debug-response" ;; return full response
+    ;;  {:post
+    ;;   (fn [received-response]
+    ;;     (response/ok (str received-response)))}]
     ["/get-users"
      {:get
       (fn [_]

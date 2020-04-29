@@ -4,18 +4,22 @@
 
 Serverside part of the 'EA' University Project.
 
-Current version provides very basic user registration and login validation functions.
+Current version provides very basic user registration and login validation functions. The server runs on JRE 11.
 
 Current functionality:
 
 * Registering new users and adding them to the DB.
 * Removing users from the DB.
-* Basic login validation. The server will send back all available user details on success.
+* Basic login validation. The server will send back all available user details on success (with exception of password).
 * Getting user data by their ID (Debug feature).
 * Getting every available user and their data (Debug feature).
 * Very basic echo test (Returns input value. Debug feature.).
 
 At the moment the server relies on conscience of the user to input valid data to the requests.
+
+### Compilation
+
+TBD
 
 ### Preliminary Configuration
 
