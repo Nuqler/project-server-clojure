@@ -3,4 +3,4 @@
 :dbname "database_name" 	;;put relevant database name here
 :user "admin"				;;DB login details
 :password "admin"
-:port "1433"}
+:port "1401"}
