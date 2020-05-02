@@ -1,7 +1,7 @@
 (ns ring-app.core
   (:gen-class)
   (:require
-   [ring-app.settings :as settings :only [server]]))
+   [ring-app.server :as settings :only [start-server stop-server]]))
 
    ;;[ring-app.routes :as routes]
    ;;[reitit.ring :as reitit]
@@ -14,5 +14,5 @@
 
 (defn -main [& args]
   (case (first args)
-    "-start" (do (.start @settings/server))
+    "-start" (settings/start-server)
     (println "No arguments were provided")))

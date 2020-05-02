@@ -1,17 +1,17 @@
 (ns ring-app.db.core
   (:require
    [next.jdbc :as sql]
-   ;;[clojure.java.jdbc :as sql]
    [hugsql.core :as hugsql]
-   [hugsql.adapter.next-jdbc :as next-adapter]
+;;   [hugsql.adapter.next-jdbc :as next-adapter]
    [clojure.edn :as edn]))
 
 ;; Get the hugsql queries
+;;(hugsql/def-db-fns "queries-v2.sql")
 (hugsql/def-db-fns "queries.sql")
 
 ;;(hugsql/set-adapter! (next-adapter/hugsql-adapter-next-jdbc))
 
-(def db
+(def ^:private db
   (try
     (edn/read-string (slurp "config.edn"))
     (catch java.io.FileNotFoundException e
@@ -19,10 +19,10 @@
 
 ;;TODO: shutdown server if no file found
 
-(def ds
-  (if (nil? db)
-    (println "ERROR: Unable to setup DB configruation. Please provide 'config.edn' file and restart the server!")
-    (sql/get-datasource db)))
+;; (def ds
+;;   (if (nil? db)
+;;     (println "ERROR: Unable to setup DB configruation. Please provide 'config.edn' file and restart the server!")
+;;     (sql/get-datasource db)))
 
 ;; create a 'users' table if it does not exist.
 ;;TODO: Prettify; add verbosity.
@@ -30,7 +30,7 @@
 
 
 ;; ----------- SQL QUERY FUNCTIONS -----------
-;;TODO: REMOVE PLAINTEXT PASSWORDS
+;;TODO: ENCRYPT PLAINTEXT PASSWORDS
 ;;TODO: Unify username and password check (less queries)
 
 (declare register-user!)
@@ -39,11 +39,16 @@
 (defn user-exists? [{:keys [username]}]
   (not (nil? (get-login-data db {:username username}))))
 
-(defn pass-correct? [login-details] ;; very basic pass validation. 
-  (= (:pass (get-login-data db login-details)) (:pass login-details)))
+;; (defn pass-correct? [login-details] ;; very basic pass validation.
+;;   (= (:pass (get-login-data db login-details)) (:pass login-details)))
+
+(defn credentials-correct? [{:keys [username pass]}]
+  (if-let [db-data (get-login-data db {:username username})]
+    (= (:pass db-data) pass)))
 
 (defn get-user-db [id-map]
   (let [user (get-user-id db id-map)]
+<<<<<<< Updated upstream
     (if (nil? user)
       (str "User not found!")
       user)))
@@ -51,6 +56,13 @@
 (defn add-user-db! [user-details] ;; add/register a new user
   (if (user-exists? (select-keys user-details [:username]))
     (str "Username already exists!")
+=======
+    (if-not (nil? user)
+      user)))
+
+(defn add-user-db! [user-details] ;; add/register a new user
+  (if-not (user-exists? (select-keys user-details [:username]))
+>>>>>>> Stashed changes
     (add-user! db user-details)))
 
 (defn remove-user-db! [id-map] ;; remove a user from DB
@@ -61,6 +73,7 @@
 (defn get-all-users-db [] ;; test function to get all the users from DB
   (get-all-users db))
 
+<<<<<<< Updated upstream
 (defn register-user! [user-details]
   (if (= 1 (add-user-db! user-details))
     (str "Success")
@@ -71,6 +84,14 @@
   (if (and (user-exists? login-details) (pass-correct? login-details))
     (get-user-details db login-details)
     (str "Incorrect username or password!")))
+=======
+(defn register-user! [user-details] ;; returns true if the user registration is successful. False if not.
+  (= 1 (add-user-db! user-details)))
+
+(defn login [login-details] ;; debug login test data. sends all available user data on success (excludes password).
+  (if (credentials-correct? login-details)
+    (get-user-details db login-details)))
+>>>>>>> Stashed changes
 
 (defn debug-login [login-details]
   (get-login-data db login-details)) ;;check DB functionality

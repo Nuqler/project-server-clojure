@@ -17,17 +17,21 @@
    ["/echo/:id"
     {:get
      (fn [{{:keys [id]} :path-params}]
-       (response/ok (str "<p>Connection successful. Received value is: " id "</p>")))}]
+       (response/ok {:result (str "Connection successful. The received value is: " id)}))}]
    ["/api"
     {:middleware [wrap-format]}
     ["/get-user/:id"
      {:get
       (fn [{{:keys [id]} :path-params}]
-          (response/ok (db/get-user-db {:id id})))}]
+        (if-let [user (db/get-user-db {:id id})]
+          (response/ok user)
+          (response/bad-request {:result "User with such ID does not exist."})))}]
     ["/register-user"
      {:post
-      (fn [{{:keys [username pass role description]} :body-params}]
-        (response/ok (db/register-user! {:username username :pass pass :role role :description description})))}] ;;TODO: change format
+      (fn [request]
+        (if (= true (db/register-user! (:body-params request)))
+            (response/ok {:result "Registration successful."})
+            (response/conflict {:result "Registration failed. Selected username already exists."})))}] ;;TODO: change format
     ["/remove-user"
      {:post
       (fn [{{:keys [id]} :body-params}]
@@ -35,11 +39,21 @@
     ["/login"
      {:post
       (fn [{{:keys [username pass]} :body-params}]
+<<<<<<< Updated upstream
         (response/ok (db/login {:username username :pass pass})))}]
     ["/debug-response" ;; return full response
      {:post
       (fn [received-response]
         (response/ok (str received-response)))}]
+=======
+        (if-let [status (db/login {:username username :pass pass})]
+          (response/ok status)
+          (response/bad-request {:result "Incorrect username or login."})))}]
+    ["/debug-response" ;; debug
+     {:post
+      (fn [request]
+        (response/ok (str (request :body-params))))}]
+>>>>>>> Stashed changes
     ["/get-users"
      {:get
       (fn [_]
