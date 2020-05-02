@@ -39,6 +39,13 @@
     ["/login"
      {:post
       (fn [{{:keys [username pass]} :body-params}]
+<<<<<<< Updated upstream
+        (response/ok (db/login {:username username :pass pass})))}]
+    ["/debug-response" ;; return full response
+     {:post
+      (fn [received-response]
+        (response/ok (str received-response)))}]
+=======
         (if-let [status (db/login {:username username :pass pass})]
           (response/ok status)
           (response/bad-request {:result "Incorrect username or login."})))}]
@@ -46,6 +53,7 @@
      {:post
       (fn [request]
         (response/ok (str (request :body-params))))}]
+>>>>>>> Stashed changes
     ["/get-users"
      {:get
       (fn [_]
