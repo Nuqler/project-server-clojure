@@ -1,7 +1,6 @@
 # University project | serverside
 
 ## Description
-***
 
 Current version provides very basic user registration and login validation functions.
 
@@ -114,7 +113,6 @@ curl http://localhost:3000/echo/something
 *Something* should be changed. Echoes back whatever you input there.
 
 ## License
-***
 
 Copyright © 2020
 
