@@ -14,32 +14,45 @@
 (def routes
   [["/" {:get response-handler
          :post response-handler}]
-   ["/echo/:id"
+   ["/echo/:input"
     {:get
-     (fn [{{:keys [id]} :path-params}]
-       (response/ok (str "<p>Connection successful. Received value is: " id "</p>")))}]
+     (fn [{{:keys [input]} :path-params}]
+       (response/ok {:result (str "<p>Connection successful. Received value is: " input "</p>")}))}]
    ["/api"
     {:middleware [wrap-format]}
-    ["/get-user/:id"
+    ["/get-user/:parameter"  ;; get user by ID or EMAIL. Debug feature.
      {:get
-      (fn [{{:keys [id]} :path-params}]
-          (response/ok (db/get-user-db {:id id})))}]
+      (fn [{{:keys [parameter]} :path-params}]
+        (if (re-matches #".+\@.+\..+" parameter)
+          (if-let [user (db/get-user-db {:email parameter})]
+            (response/ok user)
+            (response/bad-request {:result "User with such EMAIL does not exist."}))
+          (if-let [user (db/get-user-db {:userid parameter})] ;;TODO: rewrite in more concise form
+            (response/ok user)
+            (response/bad-request {:result "User with such ID does not exist."}))))}]
     ["/register-user"
      {:post
-      (fn [{{:keys [username pass role description]} :body-params}]
-        (response/ok (db/register-user! {:username username :pass pass :role role :description description})))}] ;;TODO: change format
+      (fn [{{:keys [name surname address residencecountry nationality sex email password phonenumber birthdaydate roleid]} :body-params}]
+        (if (= true (db/register-user!
+                     {:Name name :Surname surname :Address address :ResidenceCountry residencecountry :Nationality nationality :Sex sex :Email email :Password password :PhoneNumber phonenumber :BirthdayDate birthdaydate :RoleID roleid})) ;; TODO: Prettify
+          (response/ok {:result "Success."})
+          (response/conflict {:result "Failed. User with such email already exists."})))}] ;;TODO: change format
     ["/remove-user"
      {:post
-      (fn [{{:keys [id]} :body-params}]
-        (response/ok (db/remove-user-db! {:id id})))}]
+      (fn [{{:keys [userid]} :body-params}]
+        (response/ok (db/remove-user-db! {:UserID userid})))}]
+    ["/user/:email" ;; Get 'name', 'surname', 'userid' if input email exists. To be used in end application.
+     {:get
+      (fn [{{:keys [email]} :path-params}]
+        (if-let [user (db/get-login-data-db {:Email email})]
+          (response/ok user)
+          (response/bad-request {:result "User with specified email not found."})))}]
     ["/login"
      {:post
-      (fn [{{:keys [username pass]} :body-params}]
-        (response/ok (db/login {:username username :pass pass})))}]
-    ;; ["/debug-response" ;; return full response
-    ;;  {:post
-    ;;   (fn [received-response]
-    ;;     (response/ok (str received-response)))}]
+      (fn [{{:keys [email password]} :body-params}]
+        (if-let [user (db/login {:Email email :Password password})]
+          (response/ok user)
+          (response/bad-request {:result "Incorrect username or password."})))}]
     ["/get-users"
      {:get
       (fn [_]
