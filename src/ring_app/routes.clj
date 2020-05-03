@@ -14,46 +14,45 @@
 (def routes
   [["/" {:get response-handler
          :post response-handler}]
-   ["/echo/:id"
+   ["/echo/:input"
     {:get
-     (fn [{{:keys [id]} :path-params}]
-       (response/ok {:result (str "Connection successful. The received value is: " id)}))}]
+     (fn [{{:keys [input]} :path-params}]
+       (response/ok {:result (str "<p>Connection successful. Received value is: " input "</p>")}))}]
    ["/api"
     {:middleware [wrap-format]}
-    ["/get-user/:id"
+    ["/get-user/:parameter"  ;; get user by ID or EMAIL. Debug feature.
      {:get
-      (fn [{{:keys [id]} :path-params}]
-        (if-let [user (db/get-user-db {:id id})]
-          (response/ok user)
-          (response/bad-request {:result "User with such ID does not exist."})))}]
+      (fn [{{:keys [parameter]} :path-params}]
+        (if (re-matches #".+\@.+\..+" parameter)
+          (if-let [user (db/get-user-db {:email parameter})]
+            (response/ok user)
+            (response/bad-request {:result "User with such EMAIL does not exist."}))
+          (if-let [user (db/get-user-db {:userid parameter})] ;;TODO: rewrite in more concise form
+            (response/ok user)
+            (response/bad-request {:result "User with such ID does not exist."}))))}]
     ["/register-user"
      {:post
-      (fn [request]
-        (if (= true (db/register-user! (:body-params request)))
-            (response/ok {:result "Registration successful."})
-            (response/conflict {:result "Registration failed. Selected username already exists."})))}] ;;TODO: change format
+      (fn [{{:keys [name surname address residencecountry nationality sex email password phonenumber birthdaydate roleid]} :body-params}]
+        (if (= true (db/register-user!
+                     {:Name name :Surname surname :Address address :ResidenceCountry residencecountry :Nationality nationality :Sex sex :Email email :Password password :PhoneNumber phonenumber :BirthdayDate birthdaydate :RoleID roleid})) ;; TODO: Prettify
+          (response/ok {:result "Success."})
+          (response/conflict {:result "Failed. User with such email already exists."})))}] ;;TODO: change format
     ["/remove-user"
      {:post
-      (fn [{{:keys [id]} :body-params}]
-        (response/ok (db/remove-user-db! {:id id})))}]
+      (fn [{{:keys [userid]} :body-params}]
+        (response/ok (db/remove-user-db! {:UserID userid})))}]
+    ["/user/:email" ;; Get 'name', 'surname', 'userid' if input email exists. To be used in end application.
+     {:get
+      (fn [{{:keys [email]} :path-params}]
+        (if-let [user (db/get-login-data-db {:Email email})]
+          (response/ok user)
+          (response/bad-request {:result "User with specified email not found."})))}]
     ["/login"
      {:post
-      (fn [{{:keys [username pass]} :body-params}]
-<<<<<<< Updated upstream
-        (response/ok (db/login {:username username :pass pass})))}]
-    ["/debug-response" ;; return full response
-     {:post
-      (fn [received-response]
-        (response/ok (str received-response)))}]
-=======
-        (if-let [status (db/login {:username username :pass pass})]
-          (response/ok status)
-          (response/bad-request {:result "Incorrect username or login."})))}]
-    ["/debug-response" ;; debug
-     {:post
-      (fn [request]
-        (response/ok (str (request :body-params))))}]
->>>>>>> Stashed changes
+      (fn [{{:keys [email password]} :body-params}]
+        (if-let [user (db/login {:Email email :Password password})]
+          (response/ok user)
+          (response/bad-request {:result "Incorrect username or password."})))}]
     ["/get-users"
      {:get
       (fn [_]

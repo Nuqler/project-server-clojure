@@ -1,80 +1,54 @@
--- :name create-users-table-if-not-exists!
--- :command :execute
--- :result :raw
--- :doc check if the 'users' table exists
-IF NOT EXISTS (SELECT * FROM sysobjects WHERE id = object_id(N'[dbo].[users]')
-AND OBJECTPROPERTY(id, N'IsUserTable') = 1)
-CREATE TABLE [dbo].[users] (
-id int IDENTITY(1,1) PRIMARY KEY,
-username varchar(30),
-pass varchar(100),
-role varchar(16),
-description varchar(255),
-registration_date  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-)
-
--- :name create-users-table!
--- :command :execute
--- :result :raw
--- :doc create a users table
-CREATE TABLE users (
-id int IDENTITY(1,1) PRIMARY KEY,
-username varchar(30),
-pass varchar(100),
-role varchar(16),
-description varchar(255),
-registration_date  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-)
-
--- :name drop-users-table :!
--- :doc Drop users table if exists
-DROP TABLE IF EXISTS users
-
 -- :name add-user! :! :n
--- :doc adds a new user
-INSERT INTO users
-(username, pass, role, description)
-VALUES (:username, :pass, :role, :description)
+-- :doc adds a new user to the DB
+INSERT INTO [User]
+(Name, Surname, Address, ResidenceCountry, Nationality, Sex, Email, Password, PhoneNumber, BirthdayDate, RoleID)
+VALUES (:Name, :Surname, :Address, :ResidenceCountry, :Nationality, :Sex, :Email, :Password, :PhoneNumber, :BirthdayDate, :RoleID)
 
--- :name add-users! :! :n
--- :doc add multiple users
-INSERT INTO users
-(id, username, pass, role, description)
-VALUES :t*:users
-
--- :name get-user-id :? :1
--- find the user with a matching ID
+-- :name get-user-by-id :? :1
+-- :doc find the user with a matching ID
 SELECT *
-FROM users
-WHERE id = :id
+FROM [User]
+WHERE userid = :userid
 
--- :name get-user-username :? :1
--- find the user with a matching USERNAME
+-- :name get-user-by-email :? :1
+-- :doc find the user with a matching EMAIL
 SELECT *
-FROM users
-WHERE username = :username
+FROM [User]
+WHERE email = :email
 
 -- :name get-user-details :? :*
 -- :doc selects all available details for selected user (excludes password)
 SELECT * INTO #TempTable
-FROM users
-WHERE username = :username
+FROM [User]
+WHERE Email = :Email
 ALTER TABLE #TempTable
 DROP COLUMN pass
 SELECT * FROM #TempTable
 DROP TABLE #TempTable
 
+-- :name get-user-details-DEBUG :? :*
+-- :doc //DEBUG// selects all available details for selected user (excludes password) //DEBUG//
+SELECT Name, Surname, Address, ResidenceCountry, Nationality, Sex, Email, PhoneNumber, BirthdayDate, RegistrationDate, RoleID 
+FROM [User]
+WHERE Email = :Email
+
 -- :name get-login-data :? :1
--- Get login details for testing purposes
-SELECT id, username, pass
-FROM users
-WHERE username = :username
+-- :doc Get user account login details
+SELECT UserID, Email, Name, Surname
+FROM [User]
+WHERE Email = :Email
+
+-- :name get-login-data-with-password :? :1
+-- :doc Get login details for password checking
+SELECT UserID, Email, Name, Surname, Password
+FROM [User]
+WHERE Email = :Email
 
 -- :name get-all-users :? :*
 -- :doc selects all available users from the database
-SELECT * FROM users
+SELECT * FROM [User]
 
 -- :name remove-user! :!
 -- :doc removes user by specifying his ID
-DELETE FROM users 
-WHERE id = :id
+DELETE FROM [User] 
+WHERE UserID = :UserID

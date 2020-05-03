@@ -1,18 +1,9 @@
 (ns ring-app.core
   (:gen-class)
   (:require
-   [ring-app.settings :as settings :only [server]]))
-
-   ;;[ring-app.routes :as routes]
-   ;;[reitit.ring :as reitit]
-   ;;[ring.adapter.jetty :as jetty]
-   ;;[muuntaja.middleware :as muuntaja]
-   ;;[ring.util.http-response :as response]
-   ;;[ring.middleware.reload :refer [wrap-reload]]
-   ;;[muuntaja.middleware :refer [wrap-format]]
-   ;[ring-app.db.core :as db]
+   [ring-app.server :as settings :only [start-server stop-server]]))
 
 (defn -main [& args]
   (case (first args)
-    "-start" (do (.start @settings/server))
+    "-start" (settings/start-server)
     (println "No arguments were provided")))

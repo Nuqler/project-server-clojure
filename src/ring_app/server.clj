@@ -1,9 +1,11 @@
-(ns ring-app.settings
+(ns ring-app.server
   (:require
-   [ring-app.routes :as routes]
+   [ring-app.routes :refer [routes]]
+   [ring-app.db.core :refer [create-tables]]
    [ring.util.http-response :as response]
    [reitit.ring :as reitit]
-   [ring.adapter.jetty :as jetty]
+   ;;   [ring.adapter.jetty :as jetty]
+   [org.httpkit.server :as server]
    [muuntaja.middleware :as muuntaja]
    [ring.middleware.reload :refer [wrap-reload]]
    [muuntaja.middleware :refer [wrap-format]]))
@@ -11,7 +13,7 @@
 (def handler
   (reitit/routes
    (reitit/ring-handler
-    (reitit/router routes/routes))
+    (reitit/router routes)) ;; add custom routes
    (reitit/create-default-handler
     {:not-found
      (constantly (response/not-found "404 - Page not found"))
@@ -32,11 +34,23 @@
 
 ;; define server instance
 
-(defonce server
-  (delay
-    (jetty/run-jetty
-     (-> #'handler
-         wrap-nocache
-         wrap-reload)
-     {:port 3000
-      :join? true}))) ;;TRUE blocks thread until server loads
+(defonce ^:private server-api (atom nil))
+
+(defn start-server []
+  "Starts the server"
+  (println "Starting server...")
+  (reset! server-api
+          (server/run-server
+           (-> #'handler
+               wrap-nocache
+               wrap-reload)
+           {:port 3000}))
+  (create-tables)
+  (println "Success. Server launch complete."))
+
+(defn stop-server []
+  "Shutdown the server after waining for 100ms"
+  (when-not (nil? @server-api)
+    (@server-api :timeout 100)
+    (reset! server-api nil))
+  (println "Server shutdown complete."))
