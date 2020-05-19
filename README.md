@@ -2,7 +2,7 @@
 
 ## Description
 
-Current version provides very basic user registration and login validation functions.
+Current version provides very basic user registration and login validation functions. The server runs on JRE 11.
 
 Current functionality:
 
@@ -75,7 +75,7 @@ Returns 'userid', 'name', 'surname', 'email' if such email exists.
 * Login and password validation
 
 ```console
-curl -H "Content-Type: application/json" -X POST http://localhost:3000/api/login -d "{\"email\": \"abcdef@mail.com\", \"password\": \"123456\"}"
+curl -H "Content-Type: application/json" -X POST http://localhost:3000/api/user/login -d "{\"email\": \"abcdef@mail.com\", \"password\": \"123456\"}"
 ```
 
 Accepts JSON string containing 'email' and 'password'. Returns all userdata (excluding password) if entered credentials are correct.

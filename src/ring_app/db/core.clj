@@ -1,5 +1,6 @@
 (ns ring-app.db.core
   (:require
+   [buddy.hashers :as hashers]
    [next.jdbc :as sql]
    [hugsql.core :as hugsql]
    [hugsql.adapter.next-jdbc :as next-adapter]
@@ -16,28 +17,21 @@
     (catch java.io.FileNotFoundException e
       (println "--- DB Configuration file not found! ---"))))
 
+
+;;TODO: Prettify; add verbosity.
 ;;TODO: shutdown server if no file found
 
-;; (def ds
-;;   (if (nil? db)
-;;     (println "ERROR: Unable to setup DB configruation. Please provide 'config.edn' file and restart the server!")
-;;     (sql/get-datasource db)))
-
 ;; create a 'users' table if it does not exist.
-;;TODO: Prettify; add verbosity.
-
 (defn create-tables []
   "Populates DB with tables if they do not exist"
   (println "Checking DB tables...")
-  (let [status (get (first (first (create-user-table-if-not-exists! db))) 1)] ;;TODO: Rewrite this mess!
+  (let [status (get-in (create-user-table-if-not-exists! db) [0 :next.jdbc/update-count])]
     (if (= -1 status) ;; Status 0 means succesful creation. Status -1 means table already exists.
       (println "Found User table.")
       (println "Table User not found. Creating table..."))))
 
 
 ;; ----------- SQL QUERY FUNCTIONS -----------
-;;TODO: ENCRYPT PLAINTEXT PASSWORDS
-;;TODO: Unify username and password check (less queries)
 
 (declare register-user!)
 (declare add-user-db!)
@@ -50,28 +44,28 @@
 
 (defn credentials-correct? [{:keys [Email Password]}]
   (when-let [user (get-login-data-with-password db {:Email Email})]
-    (= (:password user) Password)))
+    (hashers/check Password (:password user))))
 
 (defn get-user-db [credentials-map]
   (letfn [(get-by-id [credentials-map]
             (let [user (get-user-by-id db credentials-map)]
               (if-not (nil? user)
-               user)))
+                user)))
           (get-by-email [credentials-map]
             (let [user (get-user-by-email db credentials-map)]
               (if-not (nil? user)
                 user)))]
-  (cond
-    (not= 1 (count credentials-map)) {:result "Error. Received JSON size is incorrect. Object should contain only one parameter: ID or EMAIL."}
-    (contains? credentials-map :userid) (get-by-id credentials-map)
-    (contains? credentials-map :email) (get-by-email credentials-map))))
+    (cond
+      (not= 1 (count credentials-map)) {:result "Error. Received JSON size is incorrect. Object should contain only one parameter: ID or EMAIL."}
+      (contains? credentials-map :userid) (get-by-id credentials-map)
+      (contains? credentials-map :email) (get-by-email credentials-map))))
 
 (defn add-user-db! [user-details] ;; add/register a new user
   (if-not (user-exists? (select-keys user-details [:Email]))
-    (add-user! db user-details)))
+    (add-user! db (update user-details :Password #(hashers/derive %)))))
 
 (defn remove-user-db! [id-map] ;; remove a user from DB
-  (let [status (get (first (first (remove-user! db id-map))) 1)] ;;TODO: Rewrite this mess!
+  (let [status (get-in (remove-user! db id-map) [0 :next.jdbc/update-count])]
     (if (= 1 status) ;; Status = 1 found and removed; 0 = not found.
       {:result "Success."}
       {:result "Fail. No user with such UserID found."})))

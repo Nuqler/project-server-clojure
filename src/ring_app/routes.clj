@@ -2,7 +2,8 @@
   (:require
    [ring.util.http-response :as response]
    [muuntaja.middleware :refer [wrap-format]]
-   [ring-app.db.core :as db]))
+   [ring-app.db.core :as db]
+   [ring-app.auth :as auth]))
 
 ;; testing examples
 (defn response-handler [request]
@@ -41,18 +42,29 @@
      {:post
       (fn [{{:keys [userid]} :body-params}]
         (response/ok (db/remove-user-db! {:UserID userid})))}]
-    ["/user/:email" ;; Get 'name', 'surname', 'userid' if input email exists. To be used in end application.
-     {:get
-      (fn [{{:keys [email]} :path-params}]
-        (if-let [user (db/get-login-data-db {:Email email})]
-          (response/ok user)
-          (response/bad-request {:result "User with specified email not found."})))}]
-    ["/login"
+    ["/user"
+     ["/check/:email" ;; Get 'name', 'surname', 'userid' if input email exists. To be used in end application.
+      {:get
+       (fn [{{:keys [email]} :path-params}]
+         (if-let [user (db/get-login-data-db {:Email email})]
+           (response/ok user)
+           (response/bad-request {:result "User with specified email not found."})))}]
+     ["/login"
+      {:post
+       (fn [{{:keys [email password]} :body-params}]
+         (if-let [user (db/login {:Email email :Password password})]
+           (response/ok user)
+           (response/bad-request {:result "Incorrect credentials."})))}]]
+    ["/beta-loginv2"
      {:post
       (fn [{{:keys [email password]} :body-params}]
-        (if-let [user (db/login {:Email email :Password password})]
+        (if-let [user (auth/login-get-token-test2 {:Email email :Password password})]
           (response/ok user)
-          (response/bad-request {:result "Incorrect username or password."})))}]
+          (response/bad-request {:result "Incorrect credentials."})))}]
+    ["/beta-logout"
+     {:post
+      (fn [{{:keys [email]} :body-params}]
+        (response/ok (auth/logout-token-test {:Email email})))}]
     ["/get-users"
      {:get
       (fn [_]

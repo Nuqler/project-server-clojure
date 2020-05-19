@@ -15,13 +15,13 @@ CREATE TABLE [dbo].[User](
 	[PhoneNumber] [varchar](50) NULL,
 	[BirthdayDate] [date] NOT NULL,
 	[RoleID] [int] NOT NULL,
-	[RegistrationDate] [datetime] NOT NULL DEFAULT CURRENT_TIMESTAMP,	
+	[RegistrationDate] [datetime] NOT NULL DEFAULT GETDATE(),	
  CONSTRAINT [PK_users_v2] PRIMARY KEY CLUSTERED 
 (
 	[UserID] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
 ) ON [PRIMARY]
 
--- :name drop-users-table :!
--- :doc Drop users table if exists
-DROP TABLE IF EXISTS users
+-- :name drop-user-table :!
+-- :doc Drop User table if exists
+DROP TABLE IF EXISTS user

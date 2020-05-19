@@ -41,3 +41,21 @@
 - Changed failed registration (due to duplicate username) to provide `409 Conflict` response code instead of `200 OK`.
 - Changed hugsql to use `hugsql-jdbc-next-adapter` by default.
 - Fixed timestamp showing incorrect time when retrieved from DB.
+
+## v0.05
+
+- Rewrote code for getting values from database action status `next.jdbc/update-count`.
+- Added AES password encryption on registration. Encrypted password is now stored in DB instead of plain text. Very basic for the time being.
+	- At no point are passwords decrypted back. Only encrypted hashes are compared.
+- Updated inner functions of retrieving users from DB.
+- Changed failed `login` message.
+- Changed way of generating registration date in DB from `CURRENT_TIMESTAMP` to `GETDATE()`
+- Moved `login` endpoint to `/user/login`
+- Moved `user` email check endpoint to `/user/check`
+
+# v0.05a
+
+- User authentication and password encryption is now handled by `funcool/buddy` library.
+	- Passwords are encrypted using `bcrypt+sha512` algorithm.
+- Added basic Token system for user authentication and authorization.
+- Added token-based login and logout server endpoints.
