@@ -53,7 +53,7 @@
 - Moved `login` endpoint to `/user/login`
 - Moved `user` email check endpoint to `/user/check`
 
-# v0.05a
+## v0.05a
 
 - User authentication and password encryption is now handled by `funcool/buddy` library.
 	- Passwords are encrypted using `bcrypt+sha512` algorithm.
