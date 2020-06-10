@@ -72,7 +72,7 @@ At the moment the server relies on conscience of the user to input valid data in
 
 1. Open the root folder of this project in your cmd interface or powershell.
 2. Execute `lein ring uberjar` command using leiningen.
-3. The compiled STANDALONE jar should be created at 'target' folder.
+3. The compiled STANDALONE jar should be created at 'target/uberjar' folder.
 
 ## Preliminary Configuration
 
@@ -99,7 +99,7 @@ On successful start, the server will be launched and start listening on port 300
 ## Example Usage
 
 
-This section contains example server usage. For a list of all available endpoints refer to the documentation (see docs folder).
+This section contains example server usage. For a list of all available endpoints refer to the [documentation](https://github.com/Nuqler/project-server-clojure/blob/master/docs/doc.md) (see docs folder).
 
 The server implements API which relies on POST/GET queries. The server accepts and returns json strings as accepted data type.
 
