@@ -9,6 +9,8 @@ The other parts can be found here (could be outdated):
 
 [Rating calculation](https://github.com/XOFFF/Develop-a-rating-calculation-algorithm/tree/master).
 
+[Rating calculation standalone](https://github.com/XOFFF/Presentation-version-of-Rating-calculation-algorythm).
+
 The The server runs on JRE 11.
 
 Current functionality as of `v 0.07`:
@@ -99,7 +101,7 @@ On successful start, the server will be launched and start listening on port 300
 ## Example Usage
 
 
-This section contains example server usage. For a list of all available endpoints refer to the [documentation](https://github.com/Nuqler/project-server-clojure/blob/master/docs/doc.md) (see docs folder).
+This section contains example server usage. For a list of all available endpoints refer to the [documentation](https://github.com/Nuqler/project-server-clojure/blob/master/docs/doc.md). Can also be found in 'docs' folder of the project.
 
 The server implements API which relies on POST/GET queries. The server accepts and returns json strings as accepted data type.
 
