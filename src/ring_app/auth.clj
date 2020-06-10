@@ -15,18 +15,29 @@
 
 (def tokens (atom {}))
 
-(defn login-get-token-test [login-details]
-  (if-let [validated-user (db/login login-details)]
-    (if-not (and (nil? validated-user) (contains? @tokens (keyword (:Email validated-user))))
-      (let [token (gen-random-token)
-            Email (:Email validated-user)]
-        (swap! tokens assoc (keyword token) (keyword Email))
-        (assoc-in validated-user [0 :token] token))))) ;;return user with toke
+;; (defn login-get-token-test [login-details]
+;;   (if-let [validated-user (db/login login-details)]
+;;     (if-not (and (nil? validated-user) (contains? @tokens (keyword (:Email validated-user))))
+;;       (let [token (gen-random-token)
+;;             Email (:Email validated-user)]
+;;         (swap! tokens assoc (keyword token) (keyword Email))
+;;         (assoc-in validated-user [0 :token] token))))) ;;return user with toke
 
+;; (defn validate-user
+;;   [login-details]
+;;   "First version of user validation"
+;;   (let [Email (:Email login-details)
+;;         Token (:Token login-details)]
+;;     (if (and (contains? @tokens (keyword Email)) ())
+;;       ))
+;;   )
+
+;; TODO: add token timeout.
 (defn login-get-token-test2
   [login-details]
   """Generate a unique token for user to be used for authorization. Stored in 'tokens atom'.
-     User email is used to check for existance of tokens"""
+     User email is used to check for existance of tokens.
+     Wrapper function for login without a token."""
   (if-let [validated-user (db/login login-details)]
     (let [token (gen-random-token)
           Email (:Email login-details)]
@@ -42,6 +53,6 @@
   (let [Email (:Email login-details)]
     (if (contains? @tokens (keyword Email))
       (do
-        (swap! tokens dissoc Email)
+        (swap! tokens dissoc (keyword Email))
         {:result "Successfuly logged out."})
       {:result "Error: user is not logged in."})))

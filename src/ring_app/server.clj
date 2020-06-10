@@ -1,7 +1,7 @@
 (ns ring-app.server
   (:require
    [ring-app.routes :refer [routes]]
-   [ring-app.db.core :refer [create-tables]]
+   [ring-app.db.core :refer [create-tables-debug]]
    [ring.util.http-response :as response]
    [reitit.ring :as reitit]
    ;;   [ring.adapter.jetty :as jetty]
@@ -45,7 +45,7 @@
                wrap-nocache
                wrap-reload)
            {:port 3000}))
-  (create-tables)
+  (create-tables-debug)
   (println "Success. Server launch complete."))
 
 (defn stop-server []

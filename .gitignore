@@ -14,3 +14,7 @@ resources/config.edn
 resources/queries-PSQL.sql
 config.edn
 .#project.clj
+/uploadedData/userPic
+/uploadedData/training
+/uploadedData/recognizer
+resources/ignore-setup-queries.txt

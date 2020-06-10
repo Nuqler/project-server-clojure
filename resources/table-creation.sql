@@ -1,4 +1,4 @@
--- :name create-user-table-if-not-exists! :!
+-- :name create-user-table! :!
 -- :doc check if the 'users' table exists
 IF NOT EXISTS (SELECT * FROM sysobjects WHERE id = object_id(N'[dbo].[User]')
 AND OBJECTPROPERTY(id, N'IsUserTable') = 1)
