@@ -21,7 +21,7 @@ In the future more functions may be shifted or distributed between the roles.
 ### Functions to be used in a desktop app with a UI.
 
 - **General (role independent)**
-	- Login
+	- Login.
 	- Input mail to check if the user exists.
 - **Admin**
 	- Register a new user.
