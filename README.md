@@ -92,7 +92,7 @@ Example:
 java -jar ring-app-0.0.3-SNAPSHOT-standalone.jar -start
 ```
 
-On succesful start, the server will be launched and start listening on port 3000. The server automatically checks the connected database and creates all necessary tables if they are not present.
+On successful start, the server will be launched and start listening on port 3000. The server automatically checks the connected database and creates all necessary tables if they are not present.
 
 **Warning: If you're upgrading from old versions (especially `0.0.3 -> 0.0.4`), please consider dropping DB tables before upgrading. Failing to comply may result in unexpected behaviour.**
 
@@ -103,7 +103,7 @@ This section contains example server usage. For a list of all available endpoint
 
 The server implements API which relies on POST/GET queries. The server accepts and returns json strings as accepted data type.
 
-Examples using curl in *Windows commandline* prompt.
+The following section will provide some examples using curl in *Windows commandline* prompt.
 
 **Note: every quotation mark within the request string has to be escaped in order to form correct request through *Windows commandline curl*. Another option would be to surround requests in singular brackets. Either way, a correct JSON string has to be sent.**
 
