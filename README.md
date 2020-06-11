@@ -5,15 +5,17 @@
 Employee Management System (Serverside Part) project prepared for 'IT Projects Prepared in Teams' subject.
 The other parts can be found here (could be outdated):
 
-[Clientside part](https://github.com/kalimbet/EA) and a camera module.
+* [Clientside part](https://github.com/kalimbet/EA) and a camera module.
 
-[Rating calculation](https://github.com/XOFFF/Develop-a-rating-calculation-algorithm/tree/master).
+* [Rating calculation draft](https://github.com/XOFFF/Develop-a-rating-calculation-algorithm/tree/master).
 
-[Rating calculation standalone](https://github.com/XOFFF/Presentation-version-of-Rating-calculation-algorythm).
+* [Rating calculation standalone](https://github.com/XOFFF/Presentation-version-of-Rating-calculation-algorythm).
 
-The The server runs on JRE 11.
+***
 
-Current functionality as of `v 0.07`:
+The server runs on JRE 11.
+
+The following list is comprised of functionality present as of server version `v 0.07`.
 
 Some functionality may be duplicated for some roles, while some might be missing. This is made as a first step to enabling the role request authorization process and is still WIP.
 In the future more functions may be shifted or distributed between the roles.
